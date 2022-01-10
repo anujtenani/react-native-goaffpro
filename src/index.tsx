@@ -217,14 +217,14 @@ export async function trackPageView() {
     );
     return Promise.resolve();
   }
-
   const gfp_v_id = await AsyncStorage.getItem('@gfp_v_id');
   // do the api call;
   const { id, affiliate_id } = await fetch(
-    'https://api.goaffpro.com/sdk/track/visit',
+    'https://api.goaffpro.com/v1/sdk/track/visit',
     {
       method:'POST',
       headers: {
+        'content-type':'application/json',
         'x-goaffpro-public-token': publicToken,
       },
       body: JSON.stringify({ ref, id: gfp_v_id }),
@@ -291,10 +291,11 @@ export async function trackConversion(order: Order | string) {
   const gfp_v_id = ref ? await AsyncStorage.getItem('@gfp_v_id') : null;
   //  const affiliate_id =  await AsyncStorage.getItem('@affiliate_id');
   // do the api call;
-  await fetch('https://api.goaffpro.com/sdk/track/conversion', {
+  await fetch('https://api.goaffpro.com/v1/sdk/track/conversion', {
     method:'POST',
     headers: {
       'x-goaffpro-public-token': publicToken,
+      'content-type':'application/json'
     },
     body: JSON.stringify({
       data: order,
