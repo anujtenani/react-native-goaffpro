@@ -5,7 +5,7 @@ React native module to implement goaffpro affiliate marketing system in react na
 ## Installation
 
 ```sh
-npm install react-native-goaffpro
+npm install react-native-goaffpro @react-native-async-storage/async-storage
 ```
 
 ## Usage

@@ -223,6 +223,7 @@ export async function trackPageView() {
   const { id, affiliate_id } = await fetch(
     'https://api.goaffpro.com/sdk/track/visit',
     {
+      method:'POST',
       headers: {
         'x-goaffpro-public-token': publicToken,
       },
@@ -291,6 +292,7 @@ export async function trackConversion(order: Order | string) {
   //  const affiliate_id =  await AsyncStorage.getItem('@affiliate_id');
   // do the api call;
   await fetch('https://api.goaffpro.com/sdk/track/conversion', {
+    method:'POST',
     headers: {
       'x-goaffpro-public-token': publicToken,
     },
@@ -313,4 +315,5 @@ export async function trackConversion(order: Order | string) {
     })
     .catch(() => false);
 }
-export async function getCouponCode() {}
+
+//export async function getCouponCode() {}
