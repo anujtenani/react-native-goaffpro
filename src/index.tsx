@@ -24,6 +24,7 @@ const GoaffproMobileSdk = NativeModules.GoaffproMobileSdk
  */
 var publicToken: string;
 var xConfig: GoaffproConfig;
+let logging = false;
 
 enum LinkAttribution {
   last_touch,
@@ -43,12 +44,23 @@ const defaultConfig: GoaffproConfig = {
   remove_tracking_after_order: false,
   link_attribution: LinkAttribution.last_touch,
 };
+function log(message: string) {
+  if (logging) console.log('Goaffpro:', message);
+}
+function error(message: string) {
+  if (logging) console.error('Goaffpro:', message);
+}
 
 Linking.addEventListener('url', function ({ url }) {
+  log('received URL');
   processURL(url).then(() => {
-//    console.log('url processed');
+    log('URL processed');
   });
 });
+
+export function setLogging(shouldLogToConsole: boolean) {
+  logging = shouldLogToConsole;
+}
 
 /**
  * Initializes the Goaffpro SDK.
@@ -125,13 +137,17 @@ function searchInQuery(identifiers: Array<string>, searchQuery: string) {
 }
 
 async function setConfig(config?: GoaffproConfig) {
-  xConfig =
-    config ||
-    (await fetch('https://api.goaffpro.com/v1/sdk/config.json', {
-      headers: {
-        'x-goaffpro-public-token': publicToken,
-      },
-    })
+  if (config) {
+    xConfig = config;
+  } else {
+    xConfig = await fetch(
+      'https://api-server-1.goaffpro.com/v1/sdk/config.json',
+      {
+        headers: {
+          'x-goaffpro-public-token': publicToken,
+        },
+      }
+    )
       .then((data) => data.json())
       .then(
         ({
@@ -149,10 +165,12 @@ async function setConfig(config?: GoaffproConfig) {
         }
       )
       .catch((e) => {
-        console.log(e.response.data);
-        console.error('using default config. xPublicToken is invalid');
+        error(e.response.data);
+        error('using default config. xPublicToken is invalid');
         return defaultConfig;
-      }));
+      });
+  }
+  return Promise.resolve(xConfig);
 }
 
 async function getReferralCode() {
