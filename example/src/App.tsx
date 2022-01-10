@@ -1,31 +1,48 @@
 import * as React from 'react';
-
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-goaffpro';
-
+import { View, Text } from 'react-native';
+/*
+import {
+  init,
+  trackPageView,
+  getConfig,
+  getPublicToken,
+  trackConversion,
+  isInitialized,
+} from 'react-native-goaffpro';
+ */
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+  // const [result, setResult] = React.useState<number | undefined>();
 
   React.useEffect(() => {
-    multiply(3, 7).then(setResult);
+    /*
+    init('my_storefront_token').then(() => {
+      console.log({
+        config: getConfig(),
+        isInitialized: isInitialized(),
+        publicToken: getPublicToken(),
+      });
+      trackConversion({
+        id: '#1002',
+        total: 200,
+      }).then((result) => {
+        console.log('conversion ok', result);
+      });
+    });
+
+     */
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
+    <View>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
+      <Text>Result: is OK</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-});
