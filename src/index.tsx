@@ -51,6 +51,36 @@ function error(message: string) {
   if (logging) console.error('Goaffpro:', message);
 }
 
+async function setItem(key: string, value: string) {
+  try {
+    return AsyncStorage.setItem(String(key), String(value));
+  } catch (e) {
+    return null;
+  }
+}
+async function getItem(key: string) {
+  try {
+    return AsyncStorage.getItem(String(key));
+  } catch (e) {
+    return null;
+  }
+}
+
+const storageKeys = {
+  ref: '@ref',
+  refTime: '@refTime',
+  visitId: '@gfp_v_id',
+  affiliateId: '@affiliate_id',
+};
+
+async function removeItem(key: string) {
+  try {
+    return AsyncStorage.removeItem(String(key));
+  } catch (e) {
+    return null;
+  }
+}
+
 Linking.addEventListener('url', function ({ url }) {
   log('received URL');
   processURL(url).then(() => {
@@ -175,15 +205,15 @@ async function setConfig(config?: GoaffproConfig) {
 
 async function getReferralCode() {
   const [ref, refTime] = await Promise.all([
-    AsyncStorage.getItem('@ref'),
-    AsyncStorage.getItem('@refTime'),
+    getItem(storageKeys.ref),
+    getItem(storageKeys.refTime),
   ]);
   if (refTime) {
     if (Date.now() - Number(refTime) > xConfig.cookie_duration) {
       await Promise.all([
-        AsyncStorage.removeItem('@ref'),
-        AsyncStorage.removeItem('@refTime'),
-        AsyncStorage.removeItem('@gfp_v_id'),
+        removeItem(storageKeys.ref),
+        removeItem(storageKeys.refTime),
+        removeItem(storageKeys.visitId),
       ]);
       return null;
     }
@@ -196,11 +226,11 @@ export function isInitialized() {
 }
 
 export async function setReferralCode(referralCode: string) {
-  const ref = await AsyncStorage.getItem('@ref');
+  const ref = await getItem(storageKeys.ref);
   if (!ref || ref !== referralCode) {
-    await AsyncStorage.setItem('@ref', referralCode);
-    await AsyncStorage.setItem('@refTime', String(Date.now()));
-    await AsyncStorage.removeItem('@gfp_v_id');
+    await setItem(storageKeys.ref, referralCode);
+    await setItem(storageKeys.refTime, String(Date.now()));
+    await removeItem(storageKeys.visitId);
   }
 }
 
@@ -212,29 +242,29 @@ export async function trackPageView() {
   const ref = await getReferralCode();
   if (!ref) return Promise.resolve();
   if (!publicToken) {
-    console.error(
+    error(
       'Goaffpro SDK is not initialized. Please init the SDK before calling trackPageView method'
     );
     return Promise.resolve();
   }
-  const gfp_v_id = await AsyncStorage.getItem('@gfp_v_id');
+  const gfp_v_id = await getItem(storageKeys.visitId);
   // do the api call;
   const { id, affiliate_id } = await fetch(
     'https://api.goaffpro.com/v1/sdk/track/visit',
     {
-      method:'POST',
+      method: 'POST',
       headers: {
-        'content-type':'application/json',
+        'content-type': 'application/json',
         'x-goaffpro-public-token': publicToken,
       },
       body: JSON.stringify({ ref, id: gfp_v_id }),
     }
   ).then((data) => data.json());
   if (id) {
-    await AsyncStorage.setItem('@gfp_v_id', id);
+    await setItem(storageKeys.visitId, String(id));
   }
   if (affiliate_id) {
-    await AsyncStorage.setItem('@affiliate_id', affiliate_id);
+    await setItem(storageKeys.affiliateId, String(affiliate_id));
   }
   return {
     id,
@@ -288,14 +318,14 @@ export async function trackConversion(order: Order | string) {
   }
 
   const ref = await getReferralCode();
-  const gfp_v_id = ref ? await AsyncStorage.getItem('@gfp_v_id') : null;
+  const gfp_v_id = ref ? await getItem(storageKeys.visitId) : null;
   //  const affiliate_id =  await AsyncStorage.getItem('@affiliate_id');
   // do the api call;
   await fetch('https://api.goaffpro.com/v1/sdk/track/conversion', {
-    method:'POST',
+    method: 'POST',
     headers: {
       'x-goaffpro-public-token': publicToken,
-      'content-type':'application/json'
+      'content-type': 'application/json',
     },
     body: JSON.stringify({
       data: order,
@@ -306,12 +336,15 @@ export async function trackConversion(order: Order | string) {
     .then((data) => {
       return Promise.all([
         xConfig.remove_tracking_after_order
-          ? AsyncStorage.removeItem('@ref')
+          ? removeItem(storageKeys.ref)
           : Promise.resolve(),
         xConfig.remove_tracking_after_order
-          ? AsyncStorage.removeItem('@refTime')
+          ? removeItem(storageKeys.refTime)
           : Promise.resolve(),
-        AsyncStorage.removeItem('@gfp_v_id'),
+        xConfig.remove_tracking_after_order
+          ? removeItem(storageKeys.affiliateId)
+          : Promise.resolve(),
+        removeItem(storageKeys.visitId),
       ]).then(() => data);
     })
     .catch(() => false);
