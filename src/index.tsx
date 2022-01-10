@@ -307,7 +307,7 @@ interface Order {
  * Attributes the sale to the affiliate.
  * Call this method with order data when the customer completes the order
  * @param {Order | string} order
- * @return Promise<object> Object returning thge result of the call
+ * @return Promise<object> Object returning the result of the call
  */
 export async function trackConversion(order: Order | string) {
   if (!publicToken) {
