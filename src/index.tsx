@@ -107,6 +107,10 @@ export async function init(
   await setConfig(config);
   await processURL(url);
   await trackPageView();
+  return {
+    success: 1,
+    ref_code: await getReferralCode(),
+  };
 }
 async function processURL(url: string | null) {
   if (url) {
@@ -203,7 +207,7 @@ async function setConfig(config?: GoaffproConfig) {
   return Promise.resolve(xConfig);
 }
 
-async function getReferralCode() {
+export async function getReferralCode() {
   const [ref, refTime] = await Promise.all([
     getItem(storageKeys.ref),
     getItem(storageKeys.refTime),
@@ -245,7 +249,9 @@ export async function trackPageView() {
     error(
       'Goaffpro SDK is not initialized. Please init the SDK before calling trackPageView method'
     );
-    return Promise.resolve();
+    return Promise.resolve({
+      error: 'Goaffpro SDK is not initialized. Please init the SDK before calling trackPageView method'
+    });
   }
   const gfp_v_id = await getItem(storageKeys.visitId);
   // do the api call;
@@ -311,17 +317,20 @@ interface Order {
  */
 export async function trackConversion(order: Order | string) {
   if (!publicToken) {
-    console.error(
+    error(
       'Goaffpro SDK is not initialized. Please init the SDK before calling trackConversion method'
     );
-    return Promise.resolve();
+    return Promise.resolve({
+      error:
+        'Goaffpro SDK is not initialized. Please init the SDK before calling trackConversion method',
+    });
   }
 
   const ref = await getReferralCode();
   const gfp_v_id = ref ? await getItem(storageKeys.visitId) : null;
-  //  const affiliate_id =  await AsyncStorage.getItem('@affiliate_id');
+  // const affiliate_id =  await AsyncStorage.getItem('@affiliate_id');
   // do the api call;
-  await fetch('https://api.goaffpro.com/v1/sdk/track/conversion', {
+  return fetch('https://api.goaffpro.com/v1/sdk/track/conversion', {
     method: 'POST',
     headers: {
       'x-goaffpro-public-token': publicToken,
