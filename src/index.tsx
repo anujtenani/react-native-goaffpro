@@ -213,7 +213,7 @@ export async function getReferralCode() {
     getItem(storageKeys.refTime),
   ]);
   if (refTime) {
-    if (Date.now() - Number(refTime) > xConfig.cookie_duration) {
+    if (xConfig && Date.now() - Number(refTime) > xConfig.cookie_duration) {
       await Promise.all([
         removeItem(storageKeys.ref),
         removeItem(storageKeys.refTime),
