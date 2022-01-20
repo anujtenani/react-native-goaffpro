@@ -250,7 +250,8 @@ export async function trackPageView() {
       'Goaffpro SDK is not initialized. Please init the SDK before calling trackPageView method'
     );
     return Promise.resolve({
-      error: 'Goaffpro SDK is not initialized. Please init the SDK before calling trackPageView method'
+      error:
+        'Goaffpro SDK is not initialized. Please init the SDK before calling trackPageView method',
     });
   }
   const gfp_v_id = await getItem(storageKeys.visitId);
@@ -342,6 +343,7 @@ export async function trackConversion(order: Order | string) {
       visit_id: gfp_v_id,
     }),
   })
+    .then((d) => d.json())
     .then((data) => {
       return Promise.all([
         xConfig.remove_tracking_after_order
