@@ -1,6 +1,6 @@
 {
   "name": "react-native-goaffpro",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "React native module to implement goaffpro affiliate marketing system in react native apps",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
