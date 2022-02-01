@@ -174,14 +174,11 @@ async function setConfig(config?: GoaffproConfig) {
   if (config) {
     xConfig = config;
   } else {
-    xConfig = await fetch(
-      'https://api-server-1.goaffpro.com/v1/sdk/config.json',
-      {
-        headers: {
-          'x-goaffpro-public-token': publicToken,
-        },
-      }
-    )
+    xConfig = await fetch('https://api.goaffpro.com/v1/sdk/config.json', {
+      headers: {
+        'x-goaffpro-public-token': publicToken,
+      },
+    })
       .then((data) => data.json())
       .then(
         ({
