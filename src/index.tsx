@@ -22,8 +22,8 @@ const GoaffproMobileSdk = NativeModules.GoaffproMobileSdk
       }
     );
  */
-var publicToken: string;
-var xConfig: GoaffproConfig;
+let publicToken: string;
+let xConfig: GoaffproConfig;
 let logging = false;
 
 enum LinkAttribution {
@@ -358,4 +358,46 @@ export async function trackConversion(order: Order | string) {
     .catch(() => false);
 }
 
-//export async function getCouponCode() {}
+interface AffiliatePublicProfile {
+  name: string;
+  coupon: string;
+  firstName: string;
+  lastName: string;
+  profilePhotoUrl: string;
+  companyName: string;
+  bio: string;
+}
+
+/**
+ * Retrieve details about the current affiliate.
+ * Call this method in order to retrieve detail about the affiliate
+ * @param {string} referralCode - referralCode parameter is optional. If not provided, the call will be made with current referral-code
+ * @return Promise<AffiliatePublicProfile | null>
+ */
+export async function getAffiliateDetails(
+  referralCode?: string
+): Promise<AffiliatePublicProfile | null> {
+  const ref_code = referralCode || (await getReferralCode());
+  if (ref_code) {
+    const response = await fetch(
+      'https://api.goaffpro.com/v1/sdk/affiliate?fields=name,first_name,last_name,comments,profile_photo,company_name,coupon&ref_code=' +
+        encodeURIComponent(ref_code),
+      {
+        headers: {
+          'x-goaffpro-public-token': publicToken,
+          'content-type': 'application/json',
+        },
+      }
+    ).then((data) => data.json());
+    return {
+      bio: response.comments,
+      name: response.name,
+      firstName: response.fname,
+      lastName: response.lname,
+      profilePhotoUrl: response.profile_photo,
+      companyName: response.company_name,
+      coupon: response.coupon,
+    };
+  }
+  return null;
+}

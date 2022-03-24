@@ -31,6 +31,26 @@ trackConversion({
 // https://github.com/anujtenani/goaffpro/wiki/Custom-Integration-advanced-guide#extended-order-schema-for-conversion-tracking
 
 ```
+
+## Other methods
+```js
+import { getAffiliateDetails } from "react-native-goaffpro";
+
+// returns details about the current affiliate
+getAffiliateDetails().then((data)=>{
+  console.log(data)
+
+  // here data object's shape is
+  // {
+  //   "name":"John Doe",
+  //   "firstName":"John",
+  //   "lastName":"Doe"
+  //   "coupon":"COUPONCODE",
+  // }
+})
+
+```
+
 # Android setup
 To enable deep links in your android app, you can follow the guide below
 https://developer.android.com/training/app-links/deep-linking#adding-filters
