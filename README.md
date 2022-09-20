@@ -50,6 +50,8 @@ getAffiliateDetails().then((data)=>{
 })
 
 ```
+## Sample react native app here
+https://github.com/anujtenani/react-native-goaffpro-sample-app
 
 # Android setup
 To enable deep links in your android app, you can follow the guide below
